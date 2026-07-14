@@ -201,3 +201,83 @@
     transform: none;
   }
 }
+
+/* -------------------------------------------------------------------
+   Blog article prose
+------------------------------------------------------------------- */
+.prose {
+  color: #3f3a33;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+.prose > p {
+  margin: 0 0 1.35rem;
+}
+.prose h2 {
+  color: #171310;
+  font-size: 1.6rem;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 2.5rem 0 1rem;
+}
+.prose h3 {
+  color: #171310;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 2rem 0 0.75rem;
+}
+.prose ul,
+.prose ol {
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+}
+.prose ul {
+  list-style: none;
+  padding-left: 0;
+}
+.prose ul > li {
+  position: relative;
+  padding-left: 1.75rem;
+  margin-bottom: 0.6rem;
+}
+.prose ul > li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f26b1d, #c2410c);
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose ol > li {
+  margin-bottom: 0.6rem;
+  padding-left: 0.25rem;
+}
+.prose ol > li::marker {
+  color: #c2410c;
+  font-weight: 700;
+}
+.prose strong {
+  color: #171310;
+  font-weight: 700;
+}
+.prose a {
+  color: #c2410c;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose a:hover {
+  color: #f26b1d;
+}
+.prose blockquote {
+  border-left: 3px solid #f26b1d;
+  padding-left: 1.25rem;
+  margin: 1.75rem 0;
+  font-style: italic;
+  color: #57514a;
+}

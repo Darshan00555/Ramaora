@@ -1,6 +1,8 @@
 // src/components/ui/cinematic-app-hero.jsx
 'use client';
 
+import { useGSAP } from '@gsap/react';
+
 import { useEffect, useRef } from 'react';
 
 import { gsap } from 'gsap';
@@ -9,7 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { cn } from '@/lib/utils';
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
 const INJECTED_STYLES = `
@@ -238,11 +240,11 @@ export function CinematicHero({
     };
   }, []);
 
-  // 2. Complex Cinematic Scroll Timeline
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-
-    const ctx = gsap.context(() => {
+  // 2. Complex Cinematic Scroll Timeline — useGSAP handles context scoping +
+  // cleanup and is React-StrictMode-safe (avoids the double-invoke that left
+  // the intro timeline stuck at its initial state).
+  useGSAP(
+    () => {
       gsap.set('.text-track', {
         autoAlpha: 0,
         y: 60,
@@ -285,7 +287,7 @@ export function CinematicHero({
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
-          end: '+=3600',
+          end: '+=2000',
           pin: true,
           scrub: 1,
           anticipatePin: 1,
@@ -295,20 +297,32 @@ export function CinematicHero({
       scrollTl
         .to(
           ['.hero-text-wrapper', '.bg-grid-theme'],
-          { scale: 1.15, filter: 'blur(20px)', opacity: 0.2, ease: 'power2.inOut', duration: 2 },
+          { scale: 1.12, filter: 'blur(18px)', opacity: 0.15, ease: 'power2.inOut', duration: 1.4 },
           0
         )
-        .to('.main-card', { y: 0, ease: 'power3.inOut', duration: 2 }, 0)
-        .to('.main-card', {
-          width: '100%',
-          height: '100%',
-          borderRadius: '0px',
-          ease: 'power3.inOut',
-          duration: 1.5,
-        })
+        .to('.main-card', { y: 0, ease: 'power3.inOut', duration: 1.4 }, 0)
+        .to(
+          '.main-card',
+          {
+            width: '100%',
+            height: '100%',
+            borderRadius: '0px',
+            ease: 'power3.inOut',
+            duration: 1.1,
+          },
+          '-=0.5'
+        )
+        // Reveal the card content WHILE the card is still expanding, so it is
+        // never a blank dark rectangle on the way in.
+        .fromTo(
+          '.card-right-text',
+          { x: 50, autoAlpha: 0, scale: 0.85 },
+          { x: 0, autoAlpha: 1, scale: 1, ease: 'expo.out', duration: 1.0 },
+          '-=0.95'
+        )
         .fromTo(
           '.mockup-scroll-wrapper',
-          { y: 300, z: -500, rotationX: 50, rotationY: -30, autoAlpha: 0, scale: 0.6 },
+          { y: 180, z: -350, rotationX: 36, rotationY: -22, autoAlpha: 0, scale: 0.72 },
           {
             y: 0,
             z: 0,
@@ -317,387 +331,370 @@ export function CinematicHero({
             autoAlpha: 1,
             scale: 1,
             ease: 'expo.out',
-            duration: 2.5,
+            duration: 1.3,
           },
-          '-=0.8'
+          '<0.1'
+        )
+        .fromTo(
+          '.card-left-text',
+          { x: -50, autoAlpha: 0 },
+          { x: 0, autoAlpha: 1, ease: 'power4.out', duration: 1.0 },
+          '<0.15'
         )
         .fromTo(
           '.phone-widget',
           { y: 40, autoAlpha: 0, scale: 0.95 },
-          { y: 0, autoAlpha: 1, scale: 1, stagger: 0.15, ease: 'back.out(1.2)', duration: 1.5 },
-          '-=1.5'
+          { y: 0, autoAlpha: 1, scale: 1, stagger: 0.1, ease: 'back.out(1.2)', duration: 1.0 },
+          '-=0.9'
         )
-        .to('.progress-ring', { strokeDashoffset: 60, duration: 2, ease: 'power3.inOut' }, '-=1.2')
+        .to(
+          '.progress-ring',
+          { strokeDashoffset: 60, duration: 1.3, ease: 'power3.inOut' },
+          '-=0.85'
+        )
         .to(
           '.counter-val',
-          { innerHTML: metricValue, snap: { innerHTML: 1 }, duration: 2, ease: 'expo.out' },
-          '-=2.0'
+          { innerHTML: metricValue, snap: { innerHTML: 1 }, duration: 1.3, ease: 'expo.out' },
+          '<'
         )
         .fromTo(
           '.floating-badge',
-          { y: 100, autoAlpha: 0, scale: 0.7, rotationZ: -10 },
+          { y: 70, autoAlpha: 0, scale: 0.78, rotationZ: -8 },
           {
             y: 0,
             autoAlpha: 1,
             scale: 1,
             rotationZ: 0,
-            ease: 'back.out(1.5)',
-            duration: 1.5,
-            stagger: 0.2,
+            ease: 'back.out(1.4)',
+            duration: 1.0,
+            stagger: 0.14,
           },
-          '-=2.0'
+          '-=0.9'
         )
-        .fromTo(
-          '.card-left-text',
-          { x: -50, autoAlpha: 0 },
-          { x: 0, autoAlpha: 1, ease: 'power4.out', duration: 1.5 },
-          '-=1.5'
-        )
-        .fromTo(
-          '.card-right-text',
-          { x: 50, autoAlpha: 0, scale: 0.8 },
-          { x: 0, autoAlpha: 1, scale: 1, ease: 'expo.out', duration: 1.5 },
-          '<'
-        )
-        .to({}, { duration: 0.8 })
+        .to({}, { duration: 0.3 })
         .set('.hero-text-wrapper', { autoAlpha: 0 })
-        .set('.cta-wrapper', { autoAlpha: 1 })
-        .to({}, { duration: 0.6 })
 
+        // Outro — fast + attractive. The card content leaves, the CTA rises in
+        // ON TOP, and the card dissolves behind it. No empty "blank brown" frame,
+        // and no slow pull-back / fly-off.
         .to(
-          ['.mockup-scroll-wrapper', '.card-left-text', '.card-right-text'],
+          ['.mockup-scroll-wrapper', '.card-left-text', '.card-right-text', '.floating-badge'],
           {
-            scale: 0.9,
-            y: -40,
-            z: -200,
             autoAlpha: 0,
-            ease: 'power3.in',
-            duration: 1.2,
-            stagger: 0.05,
+            y: -24,
+            scale: 0.94,
+            filter: 'blur(6px)',
+            ease: 'power2.in',
+            duration: 0.5,
+            stagger: 0.03,
           },
           'outro'
         )
-        .to(
-          '.floating-badge',
-          {
-            scale: 0.9,
-            y: -40,
-            autoAlpha: 0,
-            ease: 'power3.in',
-            duration: 1.2,
-            stagger: 0.05,
-          },
-          'outro'
-        )
-
         .to(
           '.main-card',
-          {
-            width: isMobile ? '92vw' : '85vw',
-            height: isMobile ? '92vh' : '85vh',
-            borderRadius: isMobile ? '32px' : '40px',
-            ease: 'expo.inOut',
-            duration: 1.8,
-          },
-          'pullback'
+          { autoAlpha: 0, scale: 0.965, ease: 'power2.inOut', duration: 0.7 },
+          'outro+=0.25'
         )
-        .to(
+        .fromTo(
           '.cta-wrapper',
-          { scale: 1, filter: 'blur(0px)', ease: 'expo.inOut', duration: 1.8 },
-          'pullback'
-        )
-        .to('.main-card', { y: -window.innerHeight - 300, ease: 'power3.in', duration: 1.5 });
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [metricValue]);
+          { autoAlpha: 0, scale: 0.85, filter: 'blur(20px)', y: 24 },
+          { autoAlpha: 1, scale: 1, filter: 'blur(0px)', y: 0, ease: 'expo.out', duration: 0.7 },
+          'outro+=0.3'
+        );
+    },
+    // scope confines all selector text to the hero; useGSAP reverts on cleanup
+    // (removing the pin-spacer) so navigation never hits a removeChild error.
+    { scope: containerRef, dependencies: [metricValue] }
+  );
 
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        'bg-background text-foreground relative flex h-screen w-screen items-center justify-center overflow-hidden font-sans antialiased',
-        className
-      )}
-      style={{ perspective: '1500px' }}
-      {...props}
-    >
-      <style dangerouslySetInnerHTML={{ __html: INJECTED_STYLES }} />
-      <div className="film-grain" aria-hidden="true" />
+    <div className="relative isolate w-full">
       <div
-        className="bg-grid-theme pointer-events-none absolute inset-0 z-0 opacity-50"
-        aria-hidden="true"
-      />
-
-      {/* BACKGROUND LAYER: Hero Texts */}
-      <div className="hero-text-wrapper transform-style-3d absolute z-10 flex w-screen flex-col items-center justify-center px-4 text-center will-change-transform">
-        <h1 className="text-track gsap-reveal text-3d-matte mb-2 text-5xl font-bold tracking-tight md:text-7xl lg:text-[6rem]">
-          {tagline1}
-        </h1>
-        <h1 className="text-days gsap-reveal text-brand-gradient text-5xl font-extrabold tracking-tighter md:text-7xl lg:text-[6rem]">
-          {tagline2}
-        </h1>
-      </div>
-
-      {/* BACKGROUND LAYER 2: Tactile CTA Buttons */}
-      <div className="cta-wrapper gsap-reveal pointer-events-auto absolute z-10 flex w-screen flex-col items-center justify-center px-4 text-center will-change-transform">
-        <h2 className="text-silver-matte mb-6 text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
-          {ctaHeading}
-        </h2>
-        <p className="text-muted-foreground mx-auto mb-12 max-w-xl text-lg leading-relaxed font-light md:text-xl">
-          {ctaDescription}
-        </p>
-        <div className="flex flex-col gap-6 sm:flex-row">
-          <a
-            href="/contact"
-            className="btn-modern-light group flex items-center justify-center gap-3 rounded-[1.25rem] px-8 py-4 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none"
-          >
-            <svg
-              className="h-6 w-6 transition-transform group-hover:scale-110"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-            <div className="text-left">
-              <div className="mb-[-2px] text-[10px] font-bold tracking-wider text-neutral-500 uppercase">
-                Ready to start?
-              </div>
-              <div className="text-xl leading-none font-bold tracking-tight">Get in Touch</div>
-            </div>
-          </a>
-          <a
-            href="#services"
-            className="btn-modern-dark group focus:ring-offset-background flex items-center justify-center gap-3 rounded-[1.25rem] px-8 py-4 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none"
-          >
-            <svg
-              className="h-6 w-6 transition-transform group-hover:scale-110"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              />
-            </svg>
-            <div className="text-left">
-              <div className="mb-[-2px] text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
-                Explore our
-              </div>
-              <div className="text-xl leading-none font-bold tracking-tight">Services</div>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      {/* FOREGROUND LAYER: The Physical Deep Blue Card */}
-      <div
-        className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
+        ref={containerRef}
+        className={cn(
+          'bg-background text-foreground relative flex h-screen w-screen items-center justify-center overflow-hidden font-sans antialiased',
+          className
+        )}
         style={{ perspective: '1500px' }}
+        {...props}
       >
+        <style dangerouslySetInnerHTML={{ __html: INJECTED_STYLES }} />
+        <div className="film-grain" aria-hidden="true" />
         <div
-          ref={mainCardRef}
-          className="main-card premium-depth-card gsap-reveal pointer-events-auto relative flex h-[92vh] w-[92vw] items-center justify-center overflow-hidden rounded-[32px] md:h-[85vh] md:w-[85vw] md:rounded-[40px]"
-        >
-          <div className="card-sheen" aria-hidden="true" />
+          className="bg-grid-theme pointer-events-none absolute inset-0 z-0 opacity-50"
+          aria-hidden="true"
+        />
 
-          {/* DYNAMIC RESPONSIVE GRID */}
-          <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col items-center justify-evenly px-4 py-6 lg:grid lg:grid-cols-3 lg:gap-8 lg:px-12 lg:py-0">
-            {/* 1. TOP (Mobile) / RIGHT (Desktop): BRAND NAME */}
-            <div className="card-right-text gsap-reveal z-20 order-1 flex w-full justify-center lg:order-3 lg:justify-end">
-              <h2 className="text-card-silver-matte text-6xl font-black tracking-tighter uppercase md:text-[6rem] lg:mt-0 lg:text-[8rem]">
-                {brandName}
-              </h2>
-            </div>
+        {/* BACKGROUND LAYER: Hero Texts */}
+        <div className="hero-text-wrapper transform-style-3d absolute z-10 flex w-screen flex-col items-center justify-center px-4 text-center will-change-transform">
+          <h1 className="text-track gsap-reveal text-3d-matte mb-2 text-5xl font-bold tracking-tight md:text-7xl lg:text-[6rem]">
+            {tagline1}
+          </h1>
+          <h1 className="text-days gsap-reveal text-brand-gradient text-5xl font-extrabold tracking-tighter md:text-7xl lg:text-[6rem]">
+            {tagline2}
+          </h1>
+        </div>
 
-            {/* 2. MIDDLE (Mobile) / CENTER (Desktop): IPHONE MOCKUP */}
-            <div
-              className="mockup-scroll-wrapper relative z-10 order-2 flex h-[380px] w-full items-center justify-center lg:order-2 lg:h-[600px]"
-              style={{ perspective: '1000px' }}
+        {/* BACKGROUND LAYER 2: Tactile CTA Buttons */}
+        <div className="cta-wrapper gsap-reveal pointer-events-auto absolute z-30 flex w-screen flex-col items-center justify-center px-4 text-center will-change-transform">
+          <h2 className="text-silver-matte mb-6 text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
+            {ctaHeading}
+          </h2>
+          <p className="text-muted-foreground mx-auto mb-12 max-w-xl text-lg leading-relaxed font-light md:text-xl">
+            {ctaDescription}
+          </p>
+          <div className="flex flex-col gap-6 sm:flex-row">
+            <a
+              href="/contact"
+              className="btn-modern-light group flex items-center justify-center gap-3 rounded-[1.25rem] px-8 py-4 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none"
             >
-              <div className="relative flex h-full w-full scale-[0.65] transform items-center justify-center md:scale-85 lg:scale-100">
-                <div
-                  ref={mockupRef}
-                  className="iphone-bezel transform-style-3d relative flex h-[580px] w-[280px] flex-col rounded-[3rem] will-change-transform"
-                >
-                  <div
-                    className="hardware-btn absolute top-[120px] -left-[3px] z-0 h-[25px] w-[3px] rounded-l-md"
-                    aria-hidden="true"
-                  />
-                  <div
-                    className="hardware-btn absolute top-[160px] -left-[3px] z-0 h-[45px] w-[3px] rounded-l-md"
-                    aria-hidden="true"
-                  />
-                  <div
-                    className="hardware-btn absolute top-[220px] -left-[3px] z-0 h-[45px] w-[3px] rounded-l-md"
-                    aria-hidden="true"
-                  />
-                  <div
-                    className="hardware-btn absolute top-[170px] -right-[3px] z-0 h-[70px] w-[3px] scale-x-[-1] rounded-r-md"
-                    aria-hidden="true"
-                  />
+              <svg
+                className="h-6 w-6 transition-transform group-hover:scale-110"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              <div className="text-left">
+                <div className="mb-[-2px] text-[10px] font-bold tracking-wider text-neutral-500 uppercase">
+                  Ready to start?
+                </div>
+                <div className="text-xl leading-none font-bold tracking-tight">Get in Touch</div>
+              </div>
+            </a>
+            <a
+              href="#services"
+              className="btn-modern-dark group focus:ring-offset-background flex items-center justify-center gap-3 rounded-[1.25rem] px-8 py-4 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none"
+            >
+              <svg
+                className="h-6 w-6 transition-transform group-hover:scale-110"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+              <div className="text-left">
+                <div className="mb-[-2px] text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
+                  Explore our
+                </div>
+                <div className="text-xl leading-none font-bold tracking-tight">Services</div>
+              </div>
+            </a>
+          </div>
+        </div>
 
-                  <div className="absolute inset-[7px] z-10 overflow-hidden rounded-[2.5rem] bg-[#050914] text-white shadow-[inset_0_0_15px_rgba(0,0,0,1)]">
+        {/* FOREGROUND LAYER: The Physical Deep Blue Card */}
+        <div
+          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
+          style={{ perspective: '1500px' }}
+        >
+          <div
+            ref={mainCardRef}
+            className="main-card premium-depth-card gsap-reveal pointer-events-auto relative flex h-[92vh] w-[92vw] items-center justify-center overflow-hidden rounded-[32px] md:h-[85vh] md:w-[85vw] md:rounded-[40px]"
+          >
+            <div className="card-sheen" aria-hidden="true" />
+
+            {/* DYNAMIC RESPONSIVE GRID */}
+            <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col items-center justify-evenly px-4 py-6 lg:grid lg:grid-cols-3 lg:gap-8 lg:px-12 lg:py-0">
+              {/* 1. TOP (Mobile) / RIGHT (Desktop): BRAND NAME */}
+              <div className="card-right-text gsap-reveal z-20 order-1 flex w-full justify-center lg:order-3 lg:justify-end">
+                <h2 className="text-card-silver-matte text-6xl font-black tracking-tighter uppercase md:text-[6rem] lg:mt-0 lg:text-[8rem]">
+                  {brandName}
+                </h2>
+              </div>
+
+              {/* 2. MIDDLE (Mobile) / CENTER (Desktop): IPHONE MOCKUP */}
+              <div
+                className="mockup-scroll-wrapper relative z-10 order-2 flex h-[380px] w-full items-center justify-center lg:order-2 lg:h-[600px]"
+                style={{ perspective: '1000px' }}
+              >
+                <div className="relative flex h-full w-full scale-[0.65] transform items-center justify-center md:scale-85 lg:scale-100">
+                  <div
+                    ref={mockupRef}
+                    className="iphone-bezel transform-style-3d relative flex h-[580px] w-[280px] flex-col rounded-[3rem] will-change-transform"
+                  >
                     <div
-                      className="screen-glare pointer-events-none absolute inset-0 z-40"
+                      className="hardware-btn absolute top-[120px] -left-[3px] z-0 h-[25px] w-[3px] rounded-l-md"
+                      aria-hidden="true"
+                    />
+                    <div
+                      className="hardware-btn absolute top-[160px] -left-[3px] z-0 h-[45px] w-[3px] rounded-l-md"
+                      aria-hidden="true"
+                    />
+                    <div
+                      className="hardware-btn absolute top-[220px] -left-[3px] z-0 h-[45px] w-[3px] rounded-l-md"
+                      aria-hidden="true"
+                    />
+                    <div
+                      className="hardware-btn absolute top-[170px] -right-[3px] z-0 h-[70px] w-[3px] scale-x-[-1] rounded-r-md"
                       aria-hidden="true"
                     />
 
-                    <div className="absolute top-[5px] left-1/2 z-50 flex h-[28px] w-[100px] -translate-x-1/2 items-center justify-end rounded-full bg-black px-3 shadow-[inset_0_-1px_2px_rgba(255,255,255,0.1)]">
-                      <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
-                    </div>
+                    <div className="absolute inset-[7px] z-10 overflow-hidden rounded-[2.5rem] bg-[#050914] text-white shadow-[inset_0_0_15px_rgba(0,0,0,1)]">
+                      <div
+                        className="screen-glare pointer-events-none absolute inset-0 z-40"
+                        aria-hidden="true"
+                      />
 
-                    <div className="relative flex h-full w-full flex-col px-5 pt-12 pb-8">
-                      <div className="phone-widget mb-8 flex items-center justify-between">
-                        <div className="flex flex-col">
-                          <span className="mb-1 text-[10px] font-bold tracking-widest text-neutral-400 uppercase">
-                            Dashboard
-                          </span>
-                          <span className="text-xl font-bold tracking-tight text-white drop-shadow-md">
-                            Ramaora
-                          </span>
-                        </div>
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-bold text-neutral-200 shadow-lg shadow-black/50">
-                          RA
-                        </div>
+                      <div className="absolute top-[5px] left-1/2 z-50 flex h-[28px] w-[100px] -translate-x-1/2 items-center justify-end rounded-full bg-black px-3 shadow-[inset_0_-1px_2px_rgba(255,255,255,0.1)]">
+                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
                       </div>
 
-                      <div className="phone-widget relative mx-auto mb-8 flex h-44 w-44 items-center justify-center drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]">
-                        <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
-                          <circle
-                            cx="88"
-                            cy="88"
-                            r="64"
-                            fill="none"
-                            stroke="rgba(255,255,255,0.03)"
-                            strokeWidth="12"
-                          />
-                          <circle
-                            className="progress-ring"
-                            cx="88"
-                            cy="88"
-                            r="64"
-                            fill="none"
-                            stroke="#F26B1D"
-                            strokeWidth="12"
-                          />
-                        </svg>
-                        <div className="z-10 flex flex-col items-center text-center">
-                          <span className="counter-val text-4xl font-extrabold tracking-tighter text-white">
-                            0
-                          </span>
-                          <span className="mt-0.5 text-[8px] font-bold tracking-[0.1em] text-orange-200/50 uppercase">
-                            {metricLabel}
-                          </span>
+                      <div className="relative flex h-full w-full flex-col px-5 pt-12 pb-8">
+                        <div className="phone-widget mb-8 flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="mb-1 text-[10px] font-bold tracking-widest text-neutral-400 uppercase">
+                              Dashboard
+                            </span>
+                            <span className="text-xl font-bold tracking-tight text-white drop-shadow-md">
+                              Ramaora
+                            </span>
+                          </div>
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-bold text-neutral-200 shadow-lg shadow-black/50">
+                            RA
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="space-y-3">
-                        <div className="phone-widget widget-depth flex items-center rounded-2xl p-3">
-                          <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-xl border border-orange-400/20 bg-gradient-to-br from-orange-500/20 to-orange-600/5 shadow-inner">
-                            <svg
-                              className="h-4 w-4 text-orange-400 drop-shadow-md"
+                        <div className="phone-widget relative mx-auto mb-8 flex h-44 w-44 items-center justify-center drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]">
+                          <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
+                            <circle
+                              cx="88"
+                              cy="88"
+                              r="64"
                               fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              aria-hidden="true"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <div className="mb-2 h-2 w-20 rounded-full bg-neutral-300 shadow-inner" />
-                            <div className="h-1.5 w-12 rounded-full bg-neutral-600 shadow-inner" />
-                          </div>
-                        </div>
-                        <div className="phone-widget widget-depth flex items-center rounded-2xl p-3">
-                          <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 shadow-inner">
-                            <svg
-                              className="h-4 w-4 text-emerald-400 drop-shadow-md"
+                              stroke="rgba(255,255,255,0.03)"
+                              strokeWidth="12"
+                            />
+                            <circle
+                              className="progress-ring"
+                              cx="88"
+                              cy="88"
+                              r="64"
                               fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              aria-hidden="true"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <div className="mb-2 h-2 w-16 rounded-full bg-neutral-300 shadow-inner" />
-                            <div className="h-1.5 w-24 rounded-full bg-neutral-600 shadow-inner" />
+                              stroke="#F26B1D"
+                              strokeWidth="12"
+                            />
+                          </svg>
+                          <div className="z-10 flex flex-col items-center text-center">
+                            <span className="counter-val text-4xl font-extrabold tracking-tighter text-white">
+                              0
+                            </span>
+                            <span className="mt-0.5 text-[8px] font-bold tracking-[0.1em] text-orange-200/50 uppercase">
+                              {metricLabel}
+                            </span>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="absolute bottom-2 left-1/2 h-[4px] w-[120px] -translate-x-1/2 rounded-full bg-white/20 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+                        <div className="space-y-3">
+                          <div className="phone-widget widget-depth flex items-center rounded-2xl p-3">
+                            <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-xl border border-orange-400/20 bg-gradient-to-br from-orange-500/20 to-orange-600/5 shadow-inner">
+                              <svg
+                                className="h-4 w-4 text-orange-400 drop-shadow-md"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex-1">
+                              <div className="mb-2 h-2 w-20 rounded-full bg-neutral-300 shadow-inner" />
+                              <div className="h-1.5 w-12 rounded-full bg-neutral-600 shadow-inner" />
+                            </div>
+                          </div>
+                          <div className="phone-widget widget-depth flex items-center rounded-2xl p-3">
+                            <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 shadow-inner">
+                              <svg
+                                className="h-4 w-4 text-emerald-400 drop-shadow-md"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex-1">
+                              <div className="mb-2 h-2 w-16 rounded-full bg-neutral-300 shadow-inner" />
+                              <div className="h-1.5 w-24 rounded-full bg-neutral-600 shadow-inner" />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="absolute bottom-2 left-1/2 h-[4px] w-[120px] -translate-x-1/2 rounded-full bg-white/20 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Floating Glass Badges */}
-                <div className="floating-badge floating-ui-badge absolute top-6 left-[-15px] z-30 flex items-center gap-3 rounded-xl p-3 lg:top-12 lg:left-[-80px] lg:gap-4 lg:rounded-2xl lg:p-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-400/30 bg-gradient-to-b from-orange-500/20 to-orange-900/10 shadow-inner lg:h-10 lg:w-10">
-                    <span className="text-base drop-shadow-lg lg:text-xl" aria-hidden="true">
-                      🚀
-                    </span>
+                  {/* Floating Glass Badges */}
+                  <div className="floating-badge floating-ui-badge absolute top-6 left-[-15px] z-30 flex items-center gap-3 rounded-xl p-3 lg:top-12 lg:left-[-80px] lg:gap-4 lg:rounded-2xl lg:p-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-400/30 bg-gradient-to-b from-orange-500/20 to-orange-900/10 shadow-inner lg:h-10 lg:w-10">
+                      <span className="text-base drop-shadow-lg lg:text-xl" aria-hidden="true">
+                        🚀
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold tracking-tight text-white lg:text-sm">
+                        Website Launched
+                      </p>
+                      <p className="text-[10px] font-medium text-orange-200/50 lg:text-xs">
+                        Client project live
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold tracking-tight text-white lg:text-sm">
-                      Website Launched
-                    </p>
-                    <p className="text-[10px] font-medium text-orange-200/50 lg:text-xs">
-                      Client project live
-                    </p>
-                  </div>
-                </div>
 
-                <div className="floating-badge floating-ui-badge absolute right-[-15px] bottom-12 z-30 flex items-center gap-3 rounded-xl p-3 lg:right-[-80px] lg:bottom-20 lg:gap-4 lg:rounded-2xl lg:p-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-amber-400/30 bg-gradient-to-b from-amber-500/20 to-amber-900/10 shadow-inner lg:h-10 lg:w-10">
-                    <span className="text-base drop-shadow-lg lg:text-lg" aria-hidden="true">
-                      📈
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold tracking-tight text-white lg:text-sm">
-                      ROAS +340%
-                    </p>
-                    <p className="text-[10px] font-medium text-orange-200/50 lg:text-xs">
-                      Campaign optimized
-                    </p>
+                  <div className="floating-badge floating-ui-badge absolute right-[-15px] bottom-12 z-30 flex items-center gap-3 rounded-xl p-3 lg:right-[-80px] lg:bottom-20 lg:gap-4 lg:rounded-2xl lg:p-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-amber-400/30 bg-gradient-to-b from-amber-500/20 to-amber-900/10 shadow-inner lg:h-10 lg:w-10">
+                      <span className="text-base drop-shadow-lg lg:text-lg" aria-hidden="true">
+                        📈
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold tracking-tight text-white lg:text-sm">
+                        ROAS +340%
+                      </p>
+                      <p className="text-[10px] font-medium text-orange-200/50 lg:text-xs">
+                        Campaign optimized
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* 3. BOTTOM (Mobile) / LEFT (Desktop): SERVICE TEXT */}
-            <div className="card-left-text gsap-reveal z-20 order-3 flex w-full flex-col justify-center px-4 text-center lg:order-1 lg:max-w-none lg:px-0 lg:text-left">
-              <h3 className="mb-0 text-2xl font-bold tracking-tight text-white md:text-3xl lg:mb-5 lg:text-4xl">
-                {cardHeading}
-              </h3>
-              <p className="mx-auto hidden max-w-sm text-sm leading-relaxed font-normal text-orange-100/70 md:block md:text-base lg:mx-0 lg:max-w-none lg:text-lg">
-                {cardDescription}
-              </p>
+              {/* 3. BOTTOM (Mobile) / LEFT (Desktop): SERVICE TEXT */}
+              <div className="card-left-text gsap-reveal z-20 order-3 flex w-full flex-col justify-center px-4 text-center lg:order-1 lg:max-w-none lg:px-0 lg:text-left">
+                <h3 className="mb-0 text-2xl font-bold tracking-tight text-white md:text-3xl lg:mb-5 lg:text-4xl">
+                  {cardHeading}
+                </h3>
+                <p className="mx-auto hidden max-w-sm text-sm leading-relaxed font-normal text-orange-100/70 md:block md:text-base lg:mx-0 lg:max-w-none lg:text-lg">
+                  {cardDescription}
+                </p>
+              </div>
             </div>
           </div>
         </div>

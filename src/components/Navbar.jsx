@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
-import { RamaoraLogo } from '@/components/RamaoraLogo';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
@@ -61,7 +61,14 @@ export default function Navbar() {
               onClick={closeMobile}
               aria-label="Ramaora home"
             >
-              <RamaoraLogo className="h-9 w-auto text-[#f26b1d] transition-transform duration-300 group-hover:scale-[1.04]" />
+              <Image
+                src="/logo.jpeg"
+                alt="Ramaora"
+                width={128}
+                height={72}
+                priority
+                className="h-9 w-auto transition-transform duration-300 group-hover:scale-[1.04] md:h-10"
+              />
             </Link>
 
             {/* Desktop Navigation */}
