@@ -62,7 +62,7 @@ export default function Navbar() {
               aria-label="Ramaora home"
             >
               <Image
-                src="/logo.jpeg"
+                src="/logo.png"
                 alt="Ramaora"
                 width={128}
                 height={72}

@@ -49,7 +49,7 @@ export default async function BlogPostPage({ params }) {
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.description,
-    image: [`${SITE_URL}/logo.jpeg`],
+    image: [`${SITE_URL}/logo.png`],
     datePublished: new Date(post.date).toISOString(),
     dateModified: new Date(post.updated || post.date).toISOString(),
     author: { '@type': 'Organization', name: ORG.name, url: SITE_URL },

@@ -44,17 +44,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           {/* Brand */}
           <div>
-            <Link
-              href="/"
-              className="inline-flex w-fit items-center rounded-xl bg-white px-3 py-2"
-              aria-label="Ramaora home"
-            >
+            <Link href="/" className="inline-flex w-fit items-center" aria-label="Ramaora home">
               <Image
-                src="/logo.jpeg"
+                src="/logo.png"
                 alt="Ramaora"
                 width={128}
                 height={72}
-                className="h-9 w-auto"
+                className="h-10 w-auto"
               />
             </Link>
             <p className="mt-5 max-w-xs text-[15px] leading-relaxed">

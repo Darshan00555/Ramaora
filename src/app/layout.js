@@ -30,7 +30,7 @@ export const metadata = {
   alternates: { canonical: '/' },
   icons: {
     icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
-    apple: '/logo.jpeg',
+    apple: '/logo.png',
   },
   openGraph: {
     type: 'website',
@@ -39,13 +39,13 @@ export const metadata = {
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     locale: 'en_IN',
-    images: [{ url: '/logo.jpeg', width: 1200, height: 630, alt: SITE_NAME }],
+    images: [{ url: '/logo.png', width: 640, height: 360, alt: SITE_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ramaora — From Vision to Execution',
     description: SITE_DESCRIPTION,
-    images: ['/logo.jpeg'],
+    images: ['/logo.png'],
   },
   robots: {
     index: true,

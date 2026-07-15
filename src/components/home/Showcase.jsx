@@ -2,6 +2,7 @@
 
 import Reveal from './Reveal';
 
+// Every client from the content document, in the same order, plus Poolscape.
 const PROJECTS = [
   {
     name: 'Lifecraft',
@@ -16,6 +17,13 @@ const PROJECTS = [
     slug: 'spectrumkart',
   },
   { name: 'DiamondOre', category: 'Consulting', url: 'https://diamondore.in/', slug: 'diamondore' },
+  {
+    name: 'Plastic Engineers & Fabricators',
+    category: 'Manufacturing',
+    url: 'https://plastengnr.in/',
+    slug: 'plastengnr',
+  },
+  { name: 'SimplyGift', category: 'Gifting', url: 'https://simplygift.in/', slug: 'simplygift' },
   {
     name: 'Bigwing Honda',
     category: 'Automotive',
@@ -42,6 +50,8 @@ const PROJECTS = [
     url: 'https://aranyudarchitects.com/',
     slug: 'aranyud',
   },
+  { name: 'Printer Point', category: 'E-Commerce', url: 'https://dev.etasi.org/', slug: 'etasi' },
+  { name: 'Poolscape', category: 'Events', url: 'https://poolscape.in/', slug: 'poolscape' },
 ];
 
 function domain(url) {

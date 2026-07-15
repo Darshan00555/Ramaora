@@ -11,7 +11,7 @@ export const ORG = {
   name: 'Ramaora',
   legalName: 'Ramaora',
   url: SITE_URL,
-  logo: `${SITE_URL}/logo.jpeg`,
+  logo: `${SITE_URL}/logo.png`,
   email: 'grow@ramaora.in',
   phones: ['+91-8449625310', '+91-8750300077'],
   sameAs: ['https://www.instagram.com/ramaora.ai', 'https://www.linkedin.com/company/ramaora-ai/'],

@@ -6,21 +6,21 @@ import { pageMetadata } from '@/lib/seo';
 export const metadata = pageMetadata({
   title: 'Our Team',
   description:
-    'Meet the founders and the people behind Ramaora — developers, designers, marketers, SEO specialists and content creators who build with empathy and strategy.',
+    'Meet the directors and the people behind Ramaora — developers, designers, marketers, SEO specialists and content creators who build with empathy and strategy.',
   path: '/team',
-  keywords: ['ramaora team', 'founders', 'web development team', 'marketing team'],
+  keywords: ['ramaora team', 'directors', 'web development team', 'marketing team'],
 });
 
-const FOUNDERS = [
+const DIRECTORS = [
   {
     name: 'Ruksha Razdan',
-    role: 'Co-Founder · People, Culture & Execution',
+    role: 'Director · People, Culture & Execution',
     quote: 'Rest at the end, not in the middle.',
     bio: 'With a strong foundation in Human Resources, Business Development and Project Management, Ruksha brings strategic thinking and human-centric leadership to build brands with intention and impact. She believes sustainable growth begins with strong relationships — within teams, with clients, and with the vision behind every brand. Her leadership is rooted in empathy, accountability and consistency.',
   },
   {
     name: 'Muninder Mani',
-    role: 'Co-Founder · Technology, Systems & Digital Growth',
+    role: 'Director · Technology, Systems & Digital Growth',
     quote: 'We have God on our side.',
     bio: 'Muninder leads the technology and digital-growth vision at Ramaora, building complete digital ecosystems that help startups scale with clarity and structure. From custom web applications and ERP systems to e-commerce architecture, performance marketing and lead-generation systems, he combines technology, marketing and business strategy into interconnected systems designed to last.',
   },
@@ -102,16 +102,16 @@ export default function TeamPage() {
         subtitle="A team that builds with empathy, thinks with strategy and creates with purpose — because behind every project is a person who genuinely cares."
       />
 
-      {/* Founders */}
+      {/* Directors */}
       <section className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-6 sm:px-8">
           <Reveal>
             <h2 className="text-sm font-bold tracking-[0.2em] text-neutral-400 uppercase">
-              Founders
+              Directors
             </h2>
           </Reveal>
           <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {FOUNDERS.map((f, i) => (
+            {DIRECTORS.map((f, i) => (
               <Reveal key={f.name} delay={i * 100}>
                 <div className="card-lift flex h-full flex-col rounded-3xl border border-neutral-200 bg-neutral-50 p-8 sm:p-10">
                   <div className="flex items-center gap-4">
