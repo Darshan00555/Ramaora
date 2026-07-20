@@ -2,7 +2,6 @@
 
 import Reveal from './Reveal';
 
-// Every client from the content document, in the same order, plus Poolscape.
 const PROJECTS = [
   {
     name: 'Lifecraft',
@@ -16,39 +15,19 @@ const PROJECTS = [
     url: 'https://spectrumkart.com/',
     slug: 'spectrumkart',
   },
-  { name: 'DiamondOre', category: 'Consulting', url: 'https://diamondore.in/', slug: 'diamondore' },
   {
     name: 'Plastic Engineers & Fabricators',
     category: 'Manufacturing',
     url: 'https://plastengnr.in/',
     slug: 'plastengnr',
   },
-  { name: 'SimplyGift', category: 'Gifting', url: 'https://simplygift.in/', slug: 'simplygift' },
-  {
-    name: 'Bigwing Honda',
-    category: 'Automotive',
-    url: 'https://bigwinghonda.in/',
-    slug: 'bigwinghonda',
-  },
   { name: 'Branboxx', category: 'Branding', url: 'https://branboxx.com/', slug: 'branboxx' },
   { name: 'AK CRM', category: 'SaaS Platform', url: 'https://akcrm.in/', slug: 'akcrm' },
-  {
-    name: 'Eventours India',
-    category: 'Travel',
-    url: 'https://eventoursindia.com/',
-    slug: 'eventoursindia',
-  },
   {
     name: 'The Pilates Room',
     category: 'Wellness',
     url: 'https://thepilatesroom.co.in/',
     slug: 'pilatesroom',
-  },
-  {
-    name: 'Aranyud Architects',
-    category: 'Architecture',
-    url: 'https://aranyudarchitects.com/',
-    slug: 'aranyud',
   },
   { name: 'Printer Point', category: 'E-Commerce', url: 'https://dev.etasi.org/', slug: 'etasi' },
   { name: 'Poolscape', category: 'Events', url: 'https://poolscape.in/', slug: 'poolscape' },
